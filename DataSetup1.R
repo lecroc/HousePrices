@@ -1,12 +1,12 @@
-##### Code for Post 3 on Home Sale Price Prediction
+##### Clean Data - method 1
 
 
 ### Load Data
 
 library(forcats)
 
-hdata<-read.csv("C:/Kaggle/House Prices/train.csv")
-hdata2<-read.csv("C:/Kaggle/House Prices/test.csv")
+hdata<-read.csv("C:/Kaggle/HousePrices/train.csv")
+hdata2<-read.csv("C:/Kaggle/HousePrices/test.csv")
 hdata2$SalePrice<-0
 
 # Combine train and test for data cleansing
@@ -410,7 +410,7 @@ hdata[is.na(hdata)]<-0
 sum(complete.cases(hdata))
 
 ## log transform select variales
-cols<-c("LotArea", "LotFrontage", "MasVnrArea", "BsmtFinSF1", "BsmtUnfSF", "TotalBsmtSF", "X1stFlrSF", "X2ndFlrSF", "GrLivArea", "GarageArea", "WoodDeckSF", "SalePrice")
+cols<-c("LotArea", "X1stFlrSF", "GrLivArea", "SalePrice")
 hdata[cols]<-log1p(hdata[cols])
 
 ## Seperate train and test
@@ -420,7 +420,7 @@ hdatatest<-subset(hdata, SalePrice==0)
 # Remove SalePrice from test
 hdatatest<-subset(hdatatest, select=-SalePrice)
 
-rmv<-read.csv("C:/Kaggle/House Prices/rmv.csv")
+rmv<-read.csv("C:/Kaggle/HousePrices/rmv.csv")
 rmv<-as.numeric(rmv[,2])
 hdatatrain<-hdatatrain[-rmv,] # new data frame for model without outliers
 
@@ -430,6 +430,6 @@ names(Id)<-c("Id")
 hdatatrain<-subset(hdatatrain, select=-Id)
 hdatatest<-subset(hdatatest, select=-Id)
 
-write.csv(hdatatrain, "C:/Kaggle/House Prices/train1.csv", row.names = F)
-write.csv(hdatatest, "C:/Kaggle/House Prices/test1.csv", row.names = F)
-write.csv(Id, "C:/Kaggle/House Prices/testId.csv", row.names = F)
+write.csv(hdatatrain, "C:/Kaggle/HousePrices/train1.csv", row.names = F)
+write.csv(hdatatest, "C:/Kaggle/HousePrices/test1.csv", row.names = F)
+write.csv(Id, "C:/Kaggle/HousePrices/testId.csv", row.names = F)
