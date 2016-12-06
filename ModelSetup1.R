@@ -48,7 +48,7 @@ m1<-lm(SalePrice ~ LotFrontage + LotArea + Neighborhood : GrLivArea + BsmtFinSF1
 
 TrnRMSE1<-sqrt(mean((HPtrn$SalePrice-m1$fitted.values)^2))
 m1tstpred<-predict(m1, HPtst)
-TstRMSE1<-sqrt(mean(HPtst$SalePrice-m1tstpred))
+TstRMSE1<-sqrt(mean((HPtst$SalePrice-m1tstpred)^2))
 
 # Train RMSE
 TrnRMSE1
@@ -98,10 +98,12 @@ m2<-train(SalePrice~LotFrontage + LotArea + Neighborhood : GrLivArea + BsmtFinSF
             YRSOLD2009 + BTPTH + GFINUNF + BRAG4, data=HPtrn, method="gbm", trControl=fitControl,
           verbose=F, tuneGrid=gbmGrid, metric="RMSE")
 
+# load("C:/Kaggle/HousePrices/m2.RData")
+
 m2trnpred<-predict(m2, HPtrn)
 TrnRMSE2<-sqrt(mean((HPtrn$SalePrice-m2trnpred)^2))
 m2tstpred<-predict(m2, HPtst)
-TstRMSE2<-sqrt(mean(HPtst$SalePrice-m2tstpred))
+TstRMSE2<-sqrt(mean((HPtst$SalePrice-m2tstpred)^2))
 
 
 # Train RMSE
@@ -148,10 +150,13 @@ m3<- train(SalePrice~LotFrontage + LotArea + Neighborhood : GrLivArea + BsmtFinS
              YRSOLD2009 + BTPTH + GFINUNF + BRAG4, data=HPtrn, method="rf", trControl=fitControl,
            verbose=F, metric="RMSE")
 
+
+# load("C:/Kaggle/HousePrices/m3.RData")
+
 m3trnpred<-predict(m3, HPtrn)
 TrnRMSE3<-sqrt(mean((HPtrn$SalePrice-m3trnpred)^2))
 m3tstpred<-predict(m3, HPtst)
-TstRMSE3<-sqrt(mean(HPtst$SalePrice-m3tstpred))
+TstRMSE3<-sqrt(mean((HPtst$SalePrice-m3tstpred)^2))
 
 # Train RMSE
 TrnRMSE3
@@ -198,10 +203,12 @@ m4<- train(SalePrice~LotFrontage + LotArea + Neighborhood : GrLivArea + BsmtFinS
            trControl=fitControl, metric="RMSE", tuneLength=5)
 
 
+# load("C:/Kaggle/HousePrices/m4.RData")
+
 m4trnpred<-predict(m4, HPtrn)
 TrnRMSE4<-sqrt(mean((HPtrn$SalePrice-m4trnpred)^2))
 m4tstpred<-predict(m4, HPtst)
-TstRMSE4<-sqrt(mean(HPtst$SalePrice-m4tstpred))
+TstRMSE4<-sqrt(mean((HPtst$SalePrice-m4tstpred)^2))
 
 # Train RMSE
 TrnRMSE4
