@@ -30,12 +30,12 @@ HPtst<-training[-inTrain,]
 
 ## initialize for parallel processing
 
-library(doSNOW)
-getDoParWorkers()
-registerDoSNOW(makeCluster(7, type="SOCK"))
-getDoParWorkers()
-getDoParName()
-library(foreach)
+# library(doSNOW)
+# getDoParWorkers()
+# registerDoSNOW(makeCluster(7, type="SOCK"))
+# getDoParWorkers()
+# getDoParName()
+# library(foreach)
 
 # Stepwise Regression (AIC)
 # fit <- lm(SalePrice~.,data=HPtrn)
@@ -177,15 +177,18 @@ TrnRMSE8
 TstRMSE8
 
 Id<-read.csv("C:/Kaggle/HousePrices/testId.csv")
+pr5<-predict(m5, testing)
 pr6<-predict(m6, testing)
 pr7<-predict(m7, testing)
 pr8<-predict(m8, testing)
 
+s5<-as.data.frame(cbind(Id, Saleprice=exp(pr5)))
 s6<-as.data.frame(cbind(Id, SalePrice=exp(pr6)))
 s7<-as.data.frame(cbind(Id, SalePrice=exp(pr7)))
 s8<-as.data.frame(cbind(Id, SalePrice=exp(pr8)))
 names(s8)<-c("Id", "SalePrice")
 
+write.csv(s5, "C:/Kaggle/HousePrices/s5.csv", row.names = F)
 write.csv(s6, "C:/Kaggle/HousePrices/s6.csv", row.names = F)
 write.csv(s7, "C:/Kaggle/HousePrices/s7.csv", row.names = F)
 write.csv(s8, "C:/Kaggle/HousePrices/s8.csv", row.names = F)
