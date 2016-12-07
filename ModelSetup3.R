@@ -35,9 +35,9 @@ testing<-predict(PreObj, testing)
 # model 9
 
 # Stepwise Regression (AIC)
- fit <- lm(SalePrice~.,data=HPtrn)
- step <- stepAIC(fit, direction="both")
- step$anova # display results
+# fit <- lm(SalePrice~.,data=HPtrn)
+# step <- stepAIC(fit, direction="both")
+# step$anova # display results
 
 m9<-lm(SalePrice ~ PC1 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC10 + 
          PC14 + PC15 + PC16 + PC17 + PC18 + PC20 + PC22 + PC23 + PC24 + 
