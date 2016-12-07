@@ -10,15 +10,11 @@ library(methods)
 library(vcd)
 library(e1071)
 library(DMwR)
-library(mboost)
 
 # Read in data
 
 training<-read.csv("C:/Kaggle/House Prices/train.csv", na.strings = "NA")
 testing<-read.csv("C:/Kaggle/House Prices/test.csv", na.strings = "NA")
-
-# Stash testing Id
-Id<-testing$Id
 
 # Add SalePrice to testing
 
@@ -40,13 +36,22 @@ Combo<-knnImputation(Combo, k=3)
 
 sum(complete.cases(Combo))
 
+# Create some new variables
+Combo$TotLivArea<-Combo$GrLivArea+Combo$BsmtFinSF1
+Combo$AvgRmSz<-Combo$GrLivArea/Combo$TotRmsAbvGrd
+Combo$RemodAge<-Combo$YrSold-Combo$YearRemodAdd
+Combo$RemodAge<-pmax(Combo$RemodAge, 0)
+  
+  
 # Remove columns with near zero variance
 nzv_cols <- nearZeroVar(Combo)
 if(length(nzv_cols) > 0) Combo <- Combo[, -nzv_cols]
 
-# Switch some numberics to factors
-Combo$MoSold<-as.factor(Combo$MoSold)
+# Convert select variables to factor
+
 Combo$MSSubClass<-as.factor(Combo$MSSubClass)
+Combo$MoSold<-as.factor(Combo$MoSold)
+
 
 # Separate numeric and factor variables
 
@@ -54,21 +59,28 @@ nums<-sapply(Combo, is.numeric)
 numerics<-Combo[, nums]
 factors<-Combo[, !nums]
 
-# log transform select numerics
-
-cols<-c("LotArea", "LotFrontage", "MasVnrArea", "BsmtFinSF1", "BsmtUnfSF", "TotalBsmtSF", "X1stFlrSF", "X2ndFlrSF", "GrLivArea", "GarageArea", "WoodDeckSF", "SalePrice")
-numerics[cols]<-log1p(numerics[, cols])
-
 # Remove Id
-numerics<-numerics[,2:27]
+numerics<-numerics[,2:30]
 
 # dummify factors
 dmy <- dummyVars(" ~ .", data = factors)
 dummies <- data.frame(predict(dmy, newdata = factors))
 
-# Break Out training and testing
+# Reassemble Combo
 Combo<-as.data.frame(cbind(dummies, numerics))
+
+# Re-order columns so SalePrice is first
+Combo<-Combo[, c(247, 1:246, 248:250)]
+
+# Break Out training and testing
 training<-subset(Combo, Combo$SalePrice>0)
 testing<-subset(Combo, Combo$SalePrice==0)
 testing$SalePrice<-NULL
+
+rmv<-read.csv("C:/Kaggle/HousePrices/rmv.csv")
+rmv<-as.numeric(rmv[,2])
+training<-training[-rmv,] # new data frame for model without outliers
+
+write.csv(training, file="C:/Kaggle/HousePrices/train3.csv", row.names = F)
+write.csv(testing, file="C:/Kaggle/HousePrices/test3.csv", row.names = F)
 
