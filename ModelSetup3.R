@@ -25,7 +25,7 @@ inTrain<-createDataPartition(y=training$SalePrice, p=.85, list=F)
 HPtrn<-training[inTrain,]
 HPtst<-training[-inTrain,]
 
-PreObj<-preProcess(HPtrn[,2:250], method = c("zv", "center", "scale", "pca"))
+PreObj<-preProcess(HPtrn[,2:250], method = c("zv", "center", "scale"))
 trntrans<-predict(PreObj, HPtrn[, 2:250])
 HPtrn<-as.data.frame(cbind(SalePrice=log(HPtrn$SalePrice), trntrans))
 trntsttrans<-predict(PreObj, HPtst[, 2:250])
@@ -35,19 +35,38 @@ testing<-predict(PreObj, testing)
 # model 9
 
 # Stepwise Regression (AIC)
-# fit <- lm(SalePrice~.,data=HPtrn)
-# step <- stepAIC(fit, direction="both")
-# step$anova # display results
+ fit <- lm(SalePrice~.,data=HPtrn)
+ step <- stepAIC(fit, direction="both")
+ step$anova # display results
 
-m9<-lm(SalePrice ~ PC1 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC10 + 
-         PC14 + PC15 + PC16 + PC17 + PC18 + PC20 + PC22 + PC23 + PC24 + 
-         PC25 + PC28 + PC29 + PC31 + PC33 + PC34 + PC35 + PC36 + PC37 + 
-         PC38 + PC39 + PC40 + PC41 + PC42 + PC45 + PC47 + PC48 + PC49 + 
-         PC50 + PC52 + PC54 + PC59 + PC61 + PC62 + PC64 + PC66 + PC68 + 
-         PC70 + PC72 + PC75 + PC81 + PC83 + PC84 + PC91 + PC95 + PC97 + 
-         PC99 + PC100 + PC102 + PC104 + PC105 + PC109 + PC110 + PC111 + 
-         PC115 + PC116 + PC117 + PC118 + PC121 + PC122 + PC124 + PC126 + 
-         PC127 + PC130 + PC134 + PC143 + PC146 + PC148 + PC149, data=HPtrn)
+m9<-lm(SalePrice ~ MSSubClass.20 + MSSubClass.50 + MSSubClass.60 + MSSubClass.70 + 
+         MSSubClass.75 + MSSubClass.85 + MSSubClass.90 + MSSubClass.160 + 
+         MSZoning.C..all. + MSZoning.FV + MSZoning.RH + MSZoning.RL + 
+         LotShape.IR1 + LotConfig.CulDSac + Neighborhood.CollgCr + 
+         Neighborhood.Crawfor + Neighborhood.Edwards + Neighborhood.Gilbert + 
+         Neighborhood.MeadowV + Neighborhood.Mitchel + Neighborhood.NAmes + 
+         Neighborhood.NridgHt + Neighborhood.NWAmes + Neighborhood.OldTown + 
+         Neighborhood.Sawyer + Neighborhood.StoneBr + Neighborhood.SWISU + 
+         Neighborhood.Timber + Condition1.Artery + Condition1.Feedr + 
+         Condition1.RRAe + BldgType.Twnhs + HouseStyle.1.5Fin + HouseStyle.1Story + 
+         HouseStyle.2.5Fin + HouseStyle.2Story + HouseStyle.SFoyer + 
+         RoofStyle.Gable + RoofStyle.Hip + Exterior1st.BrkFace + Exterior1st.CemntBd + 
+         Exterior1st.MetalSd + Exterior1st.Wd.Sdng + Exterior2nd.Brk.Cmn + 
+         Exterior2nd.CmentBd + Exterior2nd.VinylSd + Exterior2nd.Wd.Sdng + 
+         MasVnrType.BrkCmn + MasVnrType.BrkFace + MasVnrType.None + 
+         ExterCond.Fa + Foundation.BrkTil + Foundation.CBlock + Foundation.PConc + 
+         Foundation.Slab + Foundation.Stone + BsmtQual.Ex + BsmtQual.Fa + 
+         BsmtCond.Fa + BsmtExposure.Gd + BsmtFinType1.GLQ + BsmtFinType1.LwQ + 
+         HeatingQC.Ex + CentralAir.N + Electrical.FuseA + KitchenQual.Ex + 
+         GarageType.2Types + GarageCond.Fa + GarageCond.Po + PavedDrive.N + 
+         MoSold.5 + MoSold.6 + MoSold.7 + SaleType.ConLD + SaleType.CWD + 
+         SaleType.Oth + SaleCondition.Abnorml + SaleCondition.Family + 
+         SaleCondition.Normal + LotFrontage + LotArea + OverallQual + 
+         OverallCond + YearBuilt + YearRemodAdd + MasVnrArea + BsmtFinSF1 + 
+         TotalBsmtSF + X1stFlrSF + X2ndFlrSF + BsmtFullBath + FullBath + 
+         HalfBath + TotRmsAbvGrd + Fireplaces + GarageYrBlt + GarageCars + 
+         GarageArea + WoodDeckSF + YrSold + AvgRmSz + BsmtExposure.No + 
+         HouseStyle.1.5Unf, data=HPtrn)
 
 TrnRMSE9<-sqrt(mean((HPtrn$SalePrice-m9$fitted.values)^2))
 m9tstpred<-predict(m9, HPtst)
@@ -155,22 +174,75 @@ TrnRMSE12
 # Test RMSE
 TstRMSE12
 
+
+## Model 13 xgBoost
+
+## initialize for parallel processing
+
+library(doSNOW)
+getDoParWorkers()
+registerDoSNOW(makeCluster(7, type="SOCK"))
+getDoParWorkers()
+getDoParName()
+library(foreach)
+
+
+trdf<- data.table(HPtrn, keep.rownames=F)
+tedf<-data.table(HPtst, keep.rownames = F)
+
+xgb.grid <- expand.grid(nrounds = 500,
+                        max_depth = seq(6,10),
+                        eta = c(0.01,0.3, 1),
+                        gamma = c(0.0, 0.2, 1),
+                        colsample_bytree = c(0.5,0.8, 1)
+)
+
+
+set.seed(4321)
+
+m13 <-train(SalePrice ~.,
+                 data=trdf,
+                 method="xgbTree",
+                 metric = "RMSE",
+                 trControl=fitControl
+                 
+)
+
+# oad("C:/Kaggle/HousePrices/m13.RData")
+
+m13trnpred<-predict(m13, HPtrn)
+TrnRMSE13<-sqrt(mean((HPtrn$SalePrice-m13trnpred)^2))
+m13tstpred<-predict(m13, HPtst)
+TstRMSE13<-sqrt(mean((HPtst$SalePrice-m13tstpred)^2))
+
+
+
+# Train RMSE
+TrnRMSE13
+
+# Test RMSE
+TstRMSE13
+
+
+
 Id<-read.csv("C:/Kaggle/HousePrices/testId.csv")
 pr9<-predict(m9, testing)
 pr10<-predict(m10, testing)
 pr11<-predict(m11, testing)
 pr12<-predict(m12, testing)
+pr13<-predict(m13, testing)
 
 s9<-as.data.frame(cbind(Id, Saleprice=exp(pr9)))
 s10<-as.data.frame(cbind(Id, SalePrice=exp(pr10)))
 s11<-as.data.frame(cbind(Id, SalePrice=exp(pr11)))
 s12<-as.data.frame(cbind(Id, SalePrice=exp(pr12)))
 names(s12)<-c("Id", "SalePrice")
+s13<-as.data.frame(cbind(Id, SalePrice=exp(pr13)))
 
 write.csv(s9, "C:/Kaggle/HousePrices/s9.csv", row.names = F)
 write.csv(s10, "C:/Kaggle/HousePrices/s10.csv", row.names = F)
 write.csv(s11, "C:/Kaggle/HousePrices/s11.csv", row.names = F)
 write.csv(s12, "C:/Kaggle/HousePrices/s12.csv", row.names = F)
-
+write.csv(s13, "C:/Kaggle/HousePrices/s13.csv", row.names = F)
 
 
