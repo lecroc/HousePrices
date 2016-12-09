@@ -81,7 +81,7 @@ TstRMSE9
 
 #### gbm model ###
 
-fitControl<-trainControl(method="repeatedcv", number=10, repeats=4)
+fitControl<-trainControl(method="cv", number=10)
 
 gbmGrid<-expand.grid(interaction.depth=c(1,5,9), n.trees = (1:30)*50, shrinkage = c(.1, .05, .001), n.minobsinnode=c(6, 8, 10))
 
@@ -190,14 +190,6 @@ library(foreach)
 trdf<- data.table(HPtrn, keep.rownames=F)
 tedf<-data.table(HPtst, keep.rownames = F)
 
-xgb.grid <- expand.grid(nrounds = 500,
-                        max_depth = seq(6,10),
-                        eta = c(0.01,0.3, 1),
-                        gamma = c(0.0, 0.2, 1),
-                        colsample_bytree = c(0.5,0.8, 1)
-)
-
-
 set.seed(4321)
 
 m13 <-train(SalePrice ~.,
@@ -205,10 +197,9 @@ m13 <-train(SalePrice ~.,
                  method="xgbTree",
                  metric = "RMSE",
                  trControl=fitControl
-                 
-)
+           )
 
-# oad("C:/Kaggle/HousePrices/m13.RData")
+# load("C:/Kaggle/HousePrices/m13.RData")
 
 m13trnpred<-predict(m13, HPtrn)
 TrnRMSE13<-sqrt(mean((HPtrn$SalePrice-m13trnpred)^2))
