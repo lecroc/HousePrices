@@ -13,6 +13,8 @@ library(DMwR)
 library(mboost)
 library(randomForest)
 library(earth)
+library(plyr)
+library(nnet)
 
 
 # Models from data setup 1
@@ -75,12 +77,23 @@ names(StackTrain)<-c("SalePrice", "trp1", "trp2", "trp3", "trp4", "trp5", "trp6"
 
 ### Stack Model 
 
+## initialize for parallel processing
 
-StkM<-lm(SalePrice~., data=StackTrain)
+library(doSNOW)
+getDoParWorkers()
+registerDoSNOW(makeCluster(7, type="SOCK"))
+getDoParWorkers()
+getDoParName()
+library(foreach)
+
+# Stack Model nnet
+
+set.seed(2345)
+
+StkM<-train(SalePrice ~ ., data=StackTrain, method="brnn")
 
 StkMpred<-predict(StkM, StackTrain)
 StkRMSE<-sqrt(mean((StackTrain$SalePrice-StkMpred)^2))
-
 StkRMSE
 
 StackTest<-as.data.frame(cbind(tep1, tep2, tep3, tep4, tep5, tep6, tep7, tep8))
@@ -89,5 +102,7 @@ names(StackTest)<-c("trp1", "trp2", "trp3", "trp4", "trp5", "trp6", "trp7", "trp
 StkTestPred<-predict(StkM, StackTest)
 
 Id<-read.csv("C:/Kaggle/HousePrices/testId.csv")
-StkSub<-as.data.frame(cbind(Id, Saleprice=exp(StkTestPred)))
+StkTestPred<-exp(StkTestPred)
+StkTestPred<-round(StkTestPred, -2)
+StkSub<-as.data.frame(cbind(Id, Saleprice=StkTestPred))
 write.csv(StkSub, file="C:/Kaggle/HousePrices/StkSub.csv", row.names = F)
