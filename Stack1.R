@@ -17,6 +17,7 @@ library(randomForest)
 library(earth)
 library(plyr)
 library(nnet)
+library(brnn)
 
 
 # Models from data setup 1
@@ -72,6 +73,8 @@ load("C:/Kaggle/HousePrices/m10.RData")
 load("C:/Kaggle/HousePrices/m11.RData")
 load("C:/Kaggle/HousePrices/m12.RData")
 
+
+
 trp9<-predict(m5, train3)
 trp10<-predict(m6, train3)
 trp11<-predict(m7, train3)
@@ -101,8 +104,8 @@ tep16<-predict(m16, test3)
 
 
 SalePrice<-train2$SalePrice
-StackTrain<-as.data.frame(cbind(SalePrice, trp1, trp2, trp3, trp4, trp5, trp6, trp7, trp8, trp9, trp10, trp11, trp12, trp13, trp14, trp15, trp16))
-names(StackTrain)<-c("SalePrice", "trp1", "trp2", "trp3", "trp4", "trp5", "trp6", "trp7", "trp8", "trp10", "trp11", "trp12", "trp13", "trp14", "trp15", "trp16")
+StackTrain<-as.data.frame(cbind(SalePrice, trp1, trp2, trp3, trp4, trp5, trp6, trp7, trp8, trp13, trp14, trp15, trp16))
+names(StackTrain)<-c("SalePrice", "trp1", "trp2", "trp3", "trp4", "trp5", "trp6", "trp7", "trp8", "trp13", "trp14", "trp15", "trp16")
 
 ### Stack Model 
 
@@ -125,8 +128,8 @@ StkMpred<-predict(StkM, StackTrain)
 StkRMSE<-sqrt(mean((StackTrain$SalePrice-StkMpred)^2))
 StkRMSE
 
-StackTest<-as.data.frame(cbind(tep1, tep2, tep3, tep4, tep5, tep6, tep7, tep8, tep9, tep10, tep11, tep12, tep13, tep14, tep15, tep16))
-names(StackTest)<-c("trp1", "trp2", "trp3", "trp4", "trp5", "trp6", "trp7", "trp8", "trp9", "trp10", "trp11", "trp12", "trp13", "trp14", "trp15", "trp16")
+StackTest<-as.data.frame(cbind(tep1, tep2, tep3, tep4, tep5, tep6, tep7, tep8, tep13, tep14, tep15, tep16))
+names(StackTest)<-c("trp1", "trp2", "trp3", "trp4", "trp5", "trp6", "trp7", "trp8", "trp13", "trp14", "trp15", "trp16")
 
 StkTestPred<-predict(StkM, StackTest)
 
