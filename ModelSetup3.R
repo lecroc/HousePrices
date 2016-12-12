@@ -129,8 +129,10 @@ library(foreach)
 
 set.seed(3456)
 
-m11<- train(SalePrice ~ ., data=HPtrn, method="rf", trControl=fitControl,
-           verbose=F, metric="RMSE")
+fitControl1<-trainControl("oob")
+Grid <- expand.grid(mtry = seq(4,16,4))
+
+m11<- train(SalePrice ~ ., data=HPtrn, method="rf", trControl=fitControl1, tuneGrid=Grid, ntree=10000, verbose=T, metric="RMSE")
 
 m11trnpred<-predict(m11, HPtrn)
 TrnRMSE11<-sqrt(mean((HPtrn$SalePrice-m11trnpred)^2))
@@ -175,65 +177,22 @@ TrnRMSE12
 TstRMSE12
 
 
-## Model 13 xgBoost
-
-## initialize for parallel processing
-
-library(doSNOW)
-getDoParWorkers()
-registerDoSNOW(makeCluster(7, type="SOCK"))
-getDoParWorkers()
-getDoParName()
-library(foreach)
-
-
-trdf<- data.table(HPtrn, keep.rownames=F)
-tedf<-data.table(HPtst, keep.rownames = F)
-
-set.seed(4321)
-
-m13 <-train(SalePrice ~.,
-                 data=trdf,
-                 method="xgbTree",
-                 metric = "RMSE",
-                 trControl=fitControl
-           )
-
-# load("C:/Kaggle/HousePrices/m13.RData")
-
-m13trnpred<-predict(m13, HPtrn)
-TrnRMSE13<-sqrt(mean((HPtrn$SalePrice-m13trnpred)^2))
-m13tstpred<-predict(m13, HPtst)
-TstRMSE13<-sqrt(mean((HPtst$SalePrice-m13tstpred)^2))
-
-
-
-# Train RMSE
-TrnRMSE13
-
-# Test RMSE
-TstRMSE13
-
-
-
 Id<-read.csv("C:/Kaggle/HousePrices/testId.csv")
 pr9<-predict(m9, testing)
 pr10<-predict(m10, testing)
 pr11<-predict(m11, testing)
 pr12<-predict(m12, testing)
-pr13<-predict(m13, testing)
 
 s9<-as.data.frame(cbind(Id, Saleprice=exp(pr9)))
 s10<-as.data.frame(cbind(Id, SalePrice=exp(pr10)))
 s11<-as.data.frame(cbind(Id, SalePrice=exp(pr11)))
 s12<-as.data.frame(cbind(Id, SalePrice=exp(pr12)))
 names(s12)<-c("Id", "SalePrice")
-s13<-as.data.frame(cbind(Id, SalePrice=exp(pr13)))
 
 write.csv(s9, "C:/Kaggle/HousePrices/s9.csv", row.names = F)
 write.csv(s10, "C:/Kaggle/HousePrices/s10.csv", row.names = F)
 write.csv(s11, "C:/Kaggle/HousePrices/s11.csv", row.names = F)
 write.csv(s12, "C:/Kaggle/HousePrices/s12.csv", row.names = F)
-write.csv(s13, "C:/Kaggle/HousePrices/s13.csv", row.names = F)
+
 
 

@@ -1,4 +1,6 @@
-### Model House Prices 2
+### Stacked Model for House Prices 
+
+# Stacking 16 models created with different data setups and algorithms
 
 # Load libraries
 library(MASS)
@@ -23,14 +25,18 @@ train1<-read.csv("C:/Kaggle/HousePrices/train1.csv")
 test1<-read.csv("C:/Kaggle/HousePrices/test1.csv")
 load("C:/Kaggle/HousePrices/m1.RData")
 load("C:/Kaggle/HousePrices/m2.RData")
+load("C:/Kaggle/HousePrices/m3.RData")
+load("C:/Kaggle/HousePrices/m4.RData")
 
-trp1<-predict(m1, train1)
-trp2<-predict(m2, train1)
+trp1<-predict(m1, train1) # Step AIC regression with outliers removed and interaction term for neighborhood:GrLivArea
+trp2<-predict(m2, train1) # gbm with 10 fold repeated cv with 4 repeats
+trp3<-predict(m3, train1) # rf model with oob with mtry (4, 16, 4), ntree=10,000
+trp4<-predict(m4, train1) # MARS model 10 fold repeated cv with 4 repeats
 
 tep1<-predict(m1, test1)
 tep2<-predict(m2, test1)
-
-
+tep3<-predict(m3, test1)
+tep4<-predict(m4, test1)
 
 # Models from data setup 2
 
@@ -38,15 +44,18 @@ train2<-read.csv("C:/Kaggle/HousePrices/train2.csv")
 test2<-read.csv("C:/Kaggle/HousePrices/test2.csv")
 load("C:/Kaggle/HousePrices/m5.RData")
 load("C:/Kaggle/HousePrices/m6.RData")
+load("C:/Kaggle/HousePrices/m7.RData")
 load("C:/Kaggle/HousePrices/m8.RData")
 
-trp3<-predict(m5, train2)
-trp4<-predict(m6, train2)
-trp5<-predict(m8, train2)
+trp5<-predict(m5, train2)
+trp6<-predict(m6, train2)
+trp7<-predict(m7, train2)
+trp8<-predict(m8, train2)
 
-tep3<-predict(m5, test2)
-tep4<-predict(m6, test2)
-tep5<-predict(m8, test2)
+tep5<-predict(m5, test2)
+tep6<-predict(m6, test2)
+tep7<-predict(m7, test2)
+tep8<-predict(m8, test2)
 
 
 # Models from data setup 3
@@ -58,22 +67,42 @@ t3<-predict(PreObj, train3[, 2:250])
 train3<-as.data.frame(cbind(SalePrice=log(train3$SalePrice), t3))
 test3<-predict(PreObj, test3)
 
-
 load("C:/Kaggle/HousePrices/m9.RData")
 load("C:/Kaggle/HousePrices/m10.RData")
+load("C:/Kaggle/HousePrices/m11.RData")
 load("C:/Kaggle/HousePrices/m12.RData")
 
-trp6<-predict(m9, train3)
-trp7<-predict(m10, train3)
-trp8<-predict(m12, train3)
+trp9<-predict(m5, train3)
+trp10<-predict(m6, train3)
+trp11<-predict(m7, train3)
+trp12<-predict(m8, train3)
 
-tep6<-predict(m9, test3)
-tep7<-predict(m10, test3)
-tep8<-predict(m12, test3)
+tep9<-predict(m9, test3)
+tep10<-predict(m10, test3)
+tep11<-predict(m11, test3)
+tep12<-predict(m12, test3)
+
+# More Models from data setup 3
+
+load("C:/Kaggle/HousePrices/m13.RData")
+load("C:/Kaggle/HousePrices/m14.RData")
+load("C:/Kaggle/HousePrices/m15.RData")
+load("C:/Kaggle/HousePrices/m16.RData")
+
+trp13<-predict(m13, train3)
+trp14<-predict(m14, train3)
+trp15<-predict(m15, train3)
+trp16<-predict(m16, train3)
+
+tep13<-predict(m13, test3)
+tep14<-predict(m14, test3)
+tep15<-predict(m15, test3)
+tep16<-predict(m16, test3)
+
 
 SalePrice<-train2$SalePrice
-StackTrain<-as.data.frame(cbind(SalePrice, trp1, trp2, trp3, trp4, trp5, trp6, trp7, trp8))
-names(StackTrain)<-c("SalePrice", "trp1", "trp2", "trp3", "trp4", "trp5", "trp6", "trp7", "trp8")
+StackTrain<-as.data.frame(cbind(SalePrice, trp1, trp2, trp3, trp4, trp5, trp6, trp7, trp8, trp9, trp10, trp11, trp12, trp13, trp14, trp15, trp16))
+names(StackTrain)<-c("SalePrice", "trp1", "trp2", "trp3", "trp4", "trp5", "trp6", "trp7", "trp8", "trp10", "trp11", "trp12", "trp13", "trp14", "trp15", "trp16")
 
 ### Stack Model 
 
@@ -86,7 +115,7 @@ getDoParWorkers()
 getDoParName()
 library(foreach)
 
-# Stack Model nnet
+# Stack Model bayesian regularized neural network
 
 set.seed(2345)
 
@@ -96,8 +125,8 @@ StkMpred<-predict(StkM, StackTrain)
 StkRMSE<-sqrt(mean((StackTrain$SalePrice-StkMpred)^2))
 StkRMSE
 
-StackTest<-as.data.frame(cbind(tep1, tep2, tep3, tep4, tep5, tep6, tep7, tep8))
-names(StackTest)<-c("trp1", "trp2", "trp3", "trp4", "trp5", "trp6", "trp7", "trp8")
+StackTest<-as.data.frame(cbind(tep1, tep2, tep3, tep4, tep5, tep6, tep7, tep8, tep9, tep10, tep11, tep12, tep13, tep14, tep15, tep16))
+names(StackTest)<-c("trp1", "trp2", "trp3", "trp4", "trp5", "trp6", "trp7", "trp8", "trp9", "trp10", "trp11", "trp12", "trp13", "trp14", "trp15", "trp16")
 
 StkTestPred<-predict(StkM, StackTest)
 

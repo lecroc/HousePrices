@@ -131,8 +131,10 @@ library(foreach)
 
 set.seed(3456)
 
-m7<- train(SalePrice ~ ., data=HPtrn, method="rf", trControl=fitControl,
-           verbose=F, metric="RMSE")
+fitControl1<-trainControl("oob")
+Grid <- expand.grid(mtry = seq(4,16,4))
+
+m7<- train(SalePrice ~ ., data=HPtrn, method="rf", ntree=10000, trControl=fitControl1, tuneGrid=Grid, verbose=T, metric="RMSE")
 
 m7trnpred<-predict(m7, HPtrn)
 TrnRMSE7<-sqrt(mean((HPtrn$SalePrice-m7trnpred)^2))
