@@ -1,4 +1,4 @@
-### Model House Prices 2
+### Model House Prices 4
 
 # Load libraries
 library(MASS)
@@ -99,7 +99,7 @@ TrnRMSE14
 TstRMSE14
 
 
-## Model 15 randomGLM
+## Model 15 bagged MARS
 
 fitControl<-trainControl(method="cv", number=4)
 
@@ -114,7 +114,7 @@ library(foreach)
 
 set.seed(2345)
 
-m15<-train(SalePrice ~ ., data=HPtrn, method="randomGLM", trControl=fitControl, tuneLength=5, metric="RMSE")
+m15<-train(SalePrice ~ ., data=HPtrn, method="bagEarthGCV", metric="RMSE")
 
 m15trnpred<-predict(m15, HPtrn)
 TrnRMSE15<-sqrt(mean((HPtrn$SalePrice-m15trnpred)^2))
