@@ -38,7 +38,7 @@ testing<-predict(PreObj, testing)
 fitControl<-trainControl(method="repeatedcv", number=10, repeats=3, savePredictions = "final")
 
 # Set up model list
-modellist<-c("gbm", "bagEarthGCV", "bayesglm", "rpart", "cubist")
+modellist<-c("gbm", "bagEarthGCV", "bayesglm", "cubist")
 
 # run models
 
@@ -63,4 +63,21 @@ dotplot(results)
 modelCor(results)
 splom(results)
 
+# brnnn stack model
 
+set.seed(seed)
+stackbrnn <- caretStack(models, method="brnn", metric="RMSE", trControl=fitControl)
+print(stackbrnn)
+
+stbpred<-predict(stackbrnn, testing)
+
+Id<-read.csv("C:/Kaggle/HousePrices/testId.csv")
+
+stksub<-as.data.frame(cbind(Id, SalePrice=exp(stbpred)))
+
+stksub$SalePrice<-round(stksub$SalePrice, -2)
+
+
+# check names / str of dfs
+
+write.csv(stksub, "C:/Kaggle/HousePrices/stksubbrnn.csv", row.names = F)
