@@ -38,7 +38,7 @@ testing<-predict(PreObj, testing)
 fitControl<-trainControl(method="repeatedcv", number=10, repeats=3, savePredictions = "final")
 
 # Set up model list
-modellist<-c("gbm", "bagEarthGCV", "bayesglm", "rpart", "cubist", "svmRadialCost", "rvmLinear", "rf")
+modellist<-c("gbm", "bagEarthGCV", "bayesglm", "rpart", "cubist")
 
 # run models
 
