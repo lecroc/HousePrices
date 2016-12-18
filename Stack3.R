@@ -146,25 +146,18 @@ tep29<-predict(m29, test4)
 SalePrice<-train2$SalePrice
 StackTrain<-as.data.frame(cbind(SalePrice, trp1, trp5, trp6, trp8,
                                 trp9, trp10, trp12, trp15, trp16,
-                                trp17, trp18, trp19, trp21, trp22,
-                                trp24, trp25, trp26, trp27, trp28,
-                                trp29))
+                                trp19, trp21, trp26))
 names(StackTrain)<-c("SalePrice", "trp1", "trp5", "trp6", "trp8", 
                      "trp9", "trp10", "trp12", "trp15", "trp16",
-                     "trp17", "trp18", "trp19", "trp21", "trp22",
-                     "trp24", "trp25", "trp26", "trp27", "trp28",
-                     "trp29")
+                     "trp19", "trp21", "trp26")
 
 StackTest<-as.data.frame(cbind(tep1, tep5, tep6, tep8,
                                 tep9, tep10, tep12, tep15, tep16,
-                                tep17, tep18, tep19, tep21, tep22,
-                                tep24, tep25, tep26, tep27, tep28,
-                                tep29))
+                                tep19, tep21, tep26))
+
 names(StackTest)<-c("trp1", "trp5", "trp6", "trp8", 
                      "trp9", "trp10", "trp12", "trp15", "trp16",
-                     "trp17", "trp18", "trp19", "trp21", "trp22",
-                     "trp24", "trp25", "trp26", "trp27", "trp28",
-                     "trp29")
+                     "trp19", "trp21","trp26")
 
 
 ## Stacked Model brnn
@@ -197,3 +190,16 @@ StkTestPred<-exp(StkTestPred)
 StkTestPred<-round(StkTestPred, -2)
 StkSub<-as.data.frame(cbind(Id, Saleprice=StkTestPred))
 write.csv(StkSub, file="C:/Kaggle/HousePrices/StkSub3.csv", row.names = F)
+
+
+## Just take an average and see.....
+
+Avg<-(tep1+tep5+tep6+tep8+tep9+tep10+tep12+tep15+tep16+tep19+
+        tep21+tep26)/12
+
+Id<-read.csv("C:/Kaggle/HousePrices/testId.csv")
+Avg<-exp(Avg)
+Avg<-round(Avg, -2)
+AvgStkSub<-as.data.frame(cbind(Id, Saleprice=Avg))
+names(AvgStkSub)<-c("Id", "SalePrice")
+write.csv(AvgStkSub, file="C:/Kaggle/HousePrices/AvgStkSub.csv", row.names = F)
