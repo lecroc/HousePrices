@@ -110,7 +110,7 @@ SalePrice<-train2$SalePrice
 StackTrain<-as.data.frame(cbind(SalePrice, trp1, trp5, trp6, trp8, trp9, trp10, trp12, trp15, trp16))
 names(StackTrain)<-c("SalePrice", "trp1", "trp5", "trp6", "trp8", "trp9", "trp10", "trp12", "trp15", "trp16")
 
-### Stack Model vc
+### Stack Model brnn
 
 ## initialize for parallel processing
 
