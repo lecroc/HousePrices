@@ -29,6 +29,12 @@ library(plyr)
 library(pls)
 library(lars)
 library(monomvn)
+library(gbm)
+library(survival)
+library(splines)
+library(bst)
+library(brnn)
+library(Formula)
 
 
 
@@ -95,10 +101,10 @@ tep16<-predict(m16, test3)
 
 train4<-read.csv("C:/Kaggle/HousePrices/train3.csv")
 test4<-read.csv("C:/Kaggle/HousePrices/test3.csv")
-PreObj<-preProcess(train3[,2:250], method = c("nzv", "center", "scale"))
-t4<-predict(PreObj, train3[, 2:250])
-train4<-as.data.frame(cbind(SalePrice=log(train3$SalePrice), t3))
-test4<-predict(PreObj, test3)
+PreObj<-preProcess(train4[,2:250], method = c("nzv", "center", "scale"))
+t4<-predict(PreObj, train4[, 2:250])
+train4<-as.data.frame(cbind(SalePrice=log(train4$SalePrice), t4))
+test4<-predict(PreObj, test4)
 
 load("C:/Kaggle/HousePrices/m17.RData")
 load("C:/Kaggle/HousePrices/m18.RData")
@@ -135,11 +141,6 @@ tep26<-predict(m26, test4)
 tep27<-predict(m27, test4)
 tep28<-predict(m28, test4)
 tep29<-predict(m29, test4)
-
-
-
-
-
 
 
 SalePrice<-train2$SalePrice
@@ -184,12 +185,12 @@ set.seed(9999)
 StkM3 <-train(SalePrice ~., data=StackTrain, verbose=T, method="brnn", metric = "RMSE", trControl=fitControl, tuneLength=5)
 
 
-StkMpred<-predict(StkM, StackTrain)
+StkMpred<-predict(StkM3, StackTrain)
 StkRMSE<-sqrt(mean((StackTrain$SalePrice-StkMpred)^2))
 StkRMSE
 
 
-StkTestPred<-predict(StkM, StackTest)
+StkTestPred<-predict(StkM3, StackTest)
 
 Id<-read.csv("C:/Kaggle/HousePrices/testId.csv")
 StkTestPred<-exp(StkTestPred)
