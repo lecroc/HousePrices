@@ -1,0 +1,31 @@
+treebag - plyr, e1071, ipred
+
+bagEarth
+
+bag - no metric
+
+parRF
+
+qrf
+
+qrnn
+
+bstTree
+
+cubist
+
+gbm
+
+bstLm
+
+gaussprLinear
+
+kernelpls - pls
+
+rvmLinear
+
+lars - lars
+
+lmStepAIC
+
+nnls - nnls
