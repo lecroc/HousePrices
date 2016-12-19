@@ -144,20 +144,12 @@ tep29<-predict(m29, test4)
 
 
 SalePrice<-train2$SalePrice
-StackTrain<-as.data.frame(cbind(SalePrice, trp1, trp5, trp6, trp8,
-                                trp9, trp10, trp12, trp15, trp16,
-                                trp19, trp21, trp26))
-names(StackTrain)<-c("SalePrice", "trp1", "trp5", "trp6", "trp8", 
-                     "trp9", "trp10", "trp12", "trp15", "trp16",
-                     "trp19", "trp21", "trp26")
+StackTrain<-as.data.frame(cbind(SalePrice, trp1, trp6, trp8, trp10, trp12, trp19, trp21, trp26))
+names(StackTrain)<-c("SalePrice", "trp1", "trp6", "trp8", "trp10", "trp12", "trp19", "trp21", "trp26")
 
-StackTest<-as.data.frame(cbind(tep1, tep5, tep6, tep8,
-                                tep9, tep10, tep12, tep15, tep16,
-                                tep19, tep21, tep26))
+StackTest<-as.data.frame(cbind(tep1, tep6, tep8, tep10, tep12, tep19, tep21, tep26))
 
-names(StackTest)<-c("trp1", "trp5", "trp6", "trp8", 
-                     "trp9", "trp10", "trp12", "trp15", "trp16",
-                     "trp19", "trp21","trp26")
+names(StackTest)<-c("trp1", "trp6", "trp8", "trp10", "trp12", "trp19", "trp21","trp26")
 
 
 ## Stacked Model brnn
@@ -194,8 +186,7 @@ write.csv(StkSub, file="C:/Kaggle/HousePrices/StkSub3.csv", row.names = F)
 
 ## Just take an average and see.....
 
-Avg<-(tep1+tep5+tep6+tep8+tep9+tep10+tep12+tep15+tep16+tep19+
-        tep21+tep26)/12
+Avg<-(tep1+tep6+tep8+tep10+tep12+tep19+tep21+tep26)/8
 
 Id<-read.csv("C:/Kaggle/HousePrices/testId.csv")
 Avg<-exp(Avg)
